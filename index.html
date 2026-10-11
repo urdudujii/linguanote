@@ -3,107 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f5f7">
   <title>LinguaNote</title>
   <style>
     * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      padding: 20px;
+      margin: 0; padding: 16px;
       font-family: Arial, sans-serif;
-      background: #f3f5f7;
-      color: #222;
+      background: #f3f5f7; color: #222;
     }
-
     h1 { margin-top: 0; font-size: 25px; }
-
+    button, input { font: inherit; }
+    button {
+      padding: 9px 12px; border: 1px solid #d0d5dd;
+      border-radius: 8px; background: white; cursor: pointer;
+    }
+    button:hover { background: #f0f4fa; }
+    .primary { background: #e3edff; }
+    .panel, .workspace {
+      background: white; padding: 16px;
+      border: 1px solid #e1e5eb; border-radius: 12px;
+      min-width: 0;
+    }
+    #auth-panel { margin-bottom: 16px; }
+    .auth-row {
+      display: flex; flex-wrap: wrap;
+      align-items: center; gap: 8px;
+    }
+    .auth-row input {
+      min-width: 180px; flex: 1;
+      padding: 10px; border: 1px solid #d0d5dd;
+      border-radius: 8px;
+    }
     .layout {
       display: grid;
       grid-template-columns: 220px minmax(0, 1fr);
       gap: 16px;
     }
-
-    .panel, .workspace {
-      background: white;
-      padding: 16px;
-      border: 1px solid #e1e5eb;
-      border-radius: 12px;
-      min-width: 0;
-    }
-
-    button, input { font: inherit; }
-
-    button {
-      padding: 9px 12px;
-      border: 1px solid #d0d5dd;
-      border-radius: 8px;
-      background: white;
-      cursor: pointer;
-    }
-
-    button:hover { background: #f0f4fa; }
-
-    .primary { background: #e3edff; }
-
     #notes-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 14px;
+      display: flex; flex-direction: column;
+      gap: 8px; margin-top: 14px;
     }
-
-    .note-item {
-      text-align: left;
-      overflow-wrap: anywhere;
-    }
-
+    .note-item { text-align: left; overflow-wrap: anywhere; }
     .note-item.active {
-      background: #e3edff;
-      border-color: #6a96e8;
+      background: #e3edff; border-color: #6a96e8;
     }
-
     #note-title {
-      width: 100%;
-      font-size: 21px;
-      font-weight: bold;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 12px;
+      width: 100%; font-size: 21px; font-weight: bold;
+      border: 1px solid #ddd; border-radius: 8px;
+      padding: 10px; margin-bottom: 12px;
     }
-
     .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 12px;
+      display: flex; flex-wrap: wrap;
+      gap: 8px; align-items: center; margin-bottom: 12px;
     }
-
     canvas {
-      display: block;
-      width: 100%;
-      height: 60vh;
-      min-height: 320px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      touch-action: none;
+      display: block; width: 100%; height: 60vh;
+      min-height: 320px; border: 1px solid #ddd;
+      border-radius: 8px; touch-action: none;
     }
-
-    .hint {
-      color: #667085;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
+    .hint { color: #667085; font-size: 13px; line-height: 1.6; }
     @media (max-width: 650px) {
       body { padding: 10px; }
       .layout { grid-template-columns: 1fr; }
       .panel { padding: 12px; }
-      #notes-list {
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
+      #notes-list { flex-direction: row; flex-wrap: wrap; }
       .note-item { max-width: 100%; }
       canvas { height: 55vh; }
     }
@@ -112,17 +76,32 @@
 <body>
   <h1>LinguaNote</h1>
 
+  <section class="panel" id="auth-panel">
+    <h3>账号与云端同步</h3>
+    <form id="auth-form" class="auth-row">
+      <input id="email" type="email" placeholder="邮箱地址"
+             autocomplete="email" required>
+      <input id="password" type="password" placeholder="密码（至少 6 位）"
+             autocomplete="current-password" minlength="6" required>
+      <button class="primary" type="submit" id="login-btn">登录</button>
+      <button type="button" id="register-btn">注册账号</button>
+    </form>
+    <div class="auth-row" style="margin-top:10px">
+      <button type="button" id="logout-btn" hidden>退出登录</button>
+      <span id="auth-status" class="hint">尚未登录，笔记仅保存在当前设备。</span>
+    </div>
+  </section>
+
   <div class="layout">
     <aside class="panel">
       <h3>我的笔记</h3>
       <button id="new-note" class="primary">＋ 新建笔记</button>
       <div id="notes-list"></div>
-      <p class="hint">笔记保存在当前浏览器中。</p>
+      <p class="hint">登录后可保存到云端。</p>
     </aside>
 
     <main class="workspace">
       <input id="note-title" value="我的笔记" aria-label="笔记标题">
-
       <div class="toolbar">
         <button id="pen" class="primary">✍️ 画笔</button>
         <button id="eraser">橡皮擦</button>
@@ -133,12 +112,11 @@
         <button id="save">导出 PNG</button>
         <button id="delete-note">删除笔记</button>
       </div>
-
       <canvas id="canvas"></canvas>
       <p id="status" class="hint">准备就绪</p>
     </main>
   </div>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
