@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LinguaNote</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f3f5f7;
+      color: #222;
+    }
+
+    h1 { margin-top: 0; font-size: 25px; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .panel, .workspace {
+      background: white;
+      padding: 16px;
+      border: 1px solid #e1e5eb;
+      border-radius: 12px;
+      min-width: 0;
+    }
+
+    button, input { font: inherit; }
+
+    button {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+    }
+
+    button:hover { background: #f0f4fa; }
+
+    .primary { background: #e3edff; }
+
+    #notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .note-item {
+      text-align: left;
+      overflow-wrap: anywhere;
+    }
+
+    .note-item.active {
+      background: #e3edff;
+      border-color: #6a96e8;
+    }
+
+    #note-title {
+      width: 100%;
+      font-size: 21px;
+      font-weight: bold;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 60vh;
+      min-height: 320px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      touch-action: none;
+    }
+
+    .hint {
+      color: #667085;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 650px) {
+      body { padding: 10px; }
+      .layout { grid-template-columns: 1fr; }
+      .panel { padding: 12px; }
+      #notes-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .note-item { max-width: 100%; }
+      canvas { height: 55vh; }
+    }
+  </style>
+</head>
+<body>
+  <h1>LinguaNote</h1>
+
+  <div class="layout">
+    <aside class="panel">
+      <h3>我的笔记</h3>
+      <button id="new-note" class="primary">＋ 新建笔记</button>
+      <div id="notes-list"></div>
+      <p class="hint">笔记保存在当前浏览器中。</p>
+    </aside>
+
+    <main class="workspace">
+      <input id="note-title" value="我的笔记" aria-label="笔记标题">
+
+      <div class="toolbar">
+        <button id="pen" class="primary">✍️ 画笔</button>
+        <button id="eraser">橡皮擦</button>
+        <label>颜色 <input id="color" type="color" value="#202020"></label>
+        <label>粗细 <input id="size" type="range" min="1" max="20" value="3"></label>
+        <button id="undo">撤销</button>
+        <button id="clear">清空</button>
+        <button id="save">导出 PNG</button>
+        <button id="delete-note">删除笔记</button>
+      </div>
+
+      <canvas id="canvas"></canvas>
+      <p id="status" class="hint">准备就绪</p>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
